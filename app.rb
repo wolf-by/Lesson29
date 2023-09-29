@@ -12,8 +12,12 @@ end
 class Barber < ActiveRecord::Base
 end
 
+class Contact <ActiveRecord::Base
+end
+
 before do
 	@barbers = Barber.all
+
 end
 
 get '/' do
@@ -39,4 +43,34 @@ post '/visit' do
  	
  	erb "<h3>Спасибо, вы записались!</h3>"	
 
-end	
+end
+get '/contacts' do 
+	erb :contacts
+end
+
+post '/contacts' do
+	@email = params[:email]
+	@message = params[:message]
+
+	
+	hh2 = { :email => 'Введите email',
+			:message => 'Введите сообщение'
+	}
+
+	hh2.each do |key, value|
+		if params[key] == ''
+			@error = hh2[key]
+			return erb :contacts
+		end	
+	end	
+	
+	Contact.create :email => @email, :message => @message
+
+	f = File.open './public/contacts.txt', 'a'
+	f.write "Email клиент: #{@email}, Сообщение: #{@message}\n"
+	f.close
+
+
+
+	erb "Данные отправлены" 
+end
